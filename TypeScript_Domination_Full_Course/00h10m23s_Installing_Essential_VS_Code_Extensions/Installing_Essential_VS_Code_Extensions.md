@@ -1,0 +1,1 @@
+Extentions like ESlint.liveserver,js and ts nightly,liveserver, material icon, prettier, prettier eslint, pretty typescript error
