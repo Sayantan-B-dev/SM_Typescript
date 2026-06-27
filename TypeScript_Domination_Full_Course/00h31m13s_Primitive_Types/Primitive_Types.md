@@ -3,6 +3,9 @@
 made by var, let and const
 dont use var,
 
+types of nums, bool or string 
+
+
 number type and all its way of itis....
 why cant i change a set variable which is number to string
 
