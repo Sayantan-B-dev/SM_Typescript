@@ -41,138 +41,240 @@ registerUser({
 // });
 ```
 
-### Optional Properties in Interfaces
+## Expanded Code Examples
 
-Use the `?` modifier to mark a property as optional:
-
-```typescript
-interface Config {
-    host: string;
-    port?: number;     // Optional
-    debug?: boolean;   // Optional
-}
-
-function setupServer(config: Config): void {
-    console.log(`Host: ${config.host}`);
-    if (config.port) {
-        console.log(`Port: ${config.port}`);
-    }
-}
-
-// Both are valid:
-setupServer({ host: "localhost" });
-setupServer({ host: "localhost", port: 8080, debug: true });
-```
-
-### Readonly Properties in Interfaces
+### Example 1: Interface with Optional and Readonly Properties
 
 ```typescript
-interface Point {
-    readonly x: number;
-    readonly y: number;
-}
-
-let p: Point = { x: 10, y: 20 };
-// p.x = 5; // Error: Cannot assign to 'x' because it is a read-only property
-```
-
-### Interface Method Signatures
-
-```typescript
-interface Product {
-    id: number;
+interface Employee {
+    readonly id: number;      // Cannot be changed after assignment
     name: string;
-    price: number;
-    // Method signature
-    getDiscountedPrice(discount: number): number;
-    // Method signature using arrow function syntax
-    displayInfo: () => string;
+    email: string;
+    phone?: string;           // Optional -- may or may not exist
+    department: string;
+    salary: number;
 }
 
-const item: Product = {
+let employee: Employee = {
     id: 1,
-    name: "Laptop",
-    price: 1000,
-    getDiscountedPrice(discount: number): number {
-        return this.price - (this.price * discount) / 100;
-    },
-    displayInfo: () => `Product: ${item.name}`
+    name: "Alice",
+    email: "alice@company.com",
+    department: "Engineering",
+    salary: 75000
+};
+
+// employee.id = 2; // Error: Cannot assign to 'id' because it is a read-only property
+employee.name = "Alicia"; // OK -- not readonly
+employee.phone = "555-0100"; // OK -- was optional, now added
+```
+
+### Example 2: Interface Methods
+
+```typescript
+interface Calculator {
+    add(a: number, b: number): number;
+    subtract(a: number, b: number): number;
+    multiply(a: number, b: number): number;
+    divide(a: number, b: number): number;
+}
+
+const basicCalc: Calculator = {
+    add: (a, b) => a + b,
+    subtract: (a, b) => a - b,
+    multiply: (a, b) => a * b,
+    divide: (a, b) => b !== 0 ? a / b : Infinity
+};
+
+// Using the interface
+console.log(basicCalc.add(10, 5));       // 15
+console.log(basicCalc.divide(10, 0));    // Infinity
+
+// Method signature with arrow function syntax
+interface Logger {
+    error: (message: string, ...args: unknown[]) => void;
+    warn: (message: string, ...args: unknown[]) => void;
+    info: (message: string, ...args: unknown[]) => void;
+}
+
+const consoleLogger: Logger = {
+    error: (msg, ...args) => console.error(`[ERROR] ${msg}`, ...args),
+    warn: (msg, ...args) => console.warn(`[WARN] ${msg}`, ...args),
+    info: (msg, ...args) => console.info(`[INFO] ${msg}`, ...args)
 };
 ```
 
-### Interface for Function Types
+### Example 3: Interface for Function Types
 
 ```typescript
-interface MathOperation {
-    (a: number, b: number): number;
+// Define a callable interface
+interface StringFormatter {
+    (input: string, uppercase: boolean): string;
 }
 
-let add: MathOperation = (x, y) => x + y;
-let multiply: MathOperation = (x, y) => x * y;
+let format: StringFormatter = (input, uppercase) => {
+    return uppercase ? input.toUpperCase() : input.toLowerCase();
+};
+
+console.log(format("Hello", true));  // "HELLO"
+console.log(format("Hello", false)); // "hello"
+
+// Interface with constructor signature (newable)
+interface PointConstructor {
+    new (x: number, y: number): Point;
+}
+
+interface Point {
+    x: number;
+    y: number;
+}
+
+class Point2D implements Point {
+    constructor(public x: number, public y: number) {}
+}
+
+function createPoint(cls: PointConstructor, x: number, y: number): Point {
+    return new cls(x, y);
+}
+
+const point = createPoint(Point2D, 10, 20);
 ```
 
-### Interface for Indexable Types
+### Example 4: Interface for Indexable Types
 
 ```typescript
+// String index signature
 interface StringDictionary {
     [key: string]: string;
 }
 
 let translations: StringDictionary = {
     hello: "bonjour",
-    goodbye: "au revoir"
+    goodbye: "au revoir",
+    thankYou: "merci"
 };
 
-interface NumberArray {
+// Adding new entries is type-safe
+translations["please"] = "s'il vous plait";
+// translations["count"] = 42; // Error: number not assignable to string
+
+// Number index signature (array-like)
+interface NumberCollection {
     [index: number]: number;
+    length: number;
 }
 
-let scores: NumberArray = [95, 87, 92];
+let squares: NumberCollection = [1, 4, 9, 16, 25];
+console.log(squares[2]); // 9
+console.log(squares.length); // 5
+
+// Mixed index signatures (both string and number)
+interface MixedDictionary {
+    [key: string]: string | number;
+    [index: number]: string;
+    name: string;
+    version: number;
+}
+
+let config: MixedDictionary = {
+    name: "app-config",
+    version: 2,
+    0: "default"
+};
 ```
 
-## Type Aliases
-
-A type alias creates a new name for any type, not just object shapes.
+### Example 5: Interface with Generics
 
 ```typescript
-// Type alias for a primitive
-type ID = number;
+// Generic interface
+interface Repository<T> {
+    getById(id: string): T | undefined;
+    getAll(): T[];
+    create(item: T): void;
+    update(id: string, item: Partial<T>): void;
+    delete(id: string): void;
+}
 
-// Type alias for a union
-type Status = "active" | "inactive" | "pending";
-
-// Type alias for an object shape
-type User = {
+interface User {
+    id: string;
     name: string;
     email: string;
-    age: number;
-};
+}
 
-// Type alias for a function signature
-type Callback = (error: Error | null, data: unknown) => void;
+class UserRepository implements Repository<User> {
+    private users: User[] = [];
 
-// Type alias for complex nested types
-type ApiResponse<T> = {
-    success: boolean;
-    data: T;
-    error?: string;
-};
+    getById(id: string): User | undefined {
+        return this.users.find(u => u.id === id);
+    }
+
+    getAll(): User[] {
+        return [...this.users];
+    }
+
+    create(user: User): void {
+        this.users.push(user);
+    }
+
+    update(id: string, updates: Partial<User>): void {
+        const index = this.users.findIndex(u => u.id === id);
+        if (index !== -1) {
+            this.users[index] = { ...this.users[index], ...updates };
+        }
+    }
+
+    delete(id: string): void {
+        this.users = this.users.filter(u => u.id !== id);
+    }
+}
+
+// Generic interface with constraints
+interface Comparable<T> {
+    compareTo(other: T): number;
+}
+
+class Product implements Comparable<Product> {
+    constructor(public price: number) {}
+
+    compareTo(other: Product): number {
+        return this.price - other.price;
+    }
+}
 ```
 
-## Interfaces vs Type Aliases
+### Example 6: Interface Extension
 
-| Feature                 | Interface                             | Type Alias                           |
-|-------------------------|---------------------------------------|--------------------------------------|
-| Object shape            | Yes                                   | Yes                                  |
-| Union types             | No                                    | Yes                                  |
-| Intersection types      | Via extends                           | Using `&`                            |
-| Declaration merging     | Yes (same name merges)                | No (duplicate name errors)           |
-| Extends/Implements      | Yes                                   | No (but can use intersection)        |
-| Primitive types         | No                                    | Yes (e.g., `type ID = number`)       |
-| Computed properties     | No                                    | Yes                                  |
-| Mapped types            | No                                    | Yes                                  |
+```typescript
+interface Animal {
+    name: string;
+    makeSound(): string;
+}
 
-### Declaration Merging (Interface Only)
+interface Dog extends Animal {
+    breed: string;
+    isTrained: boolean;
+}
+
+// Dog has: name, makeSound(), breed, isTrained
+let myDog: Dog = {
+    name: "Rex",
+    breed: "Labrador",
+    isTrained: true,
+    makeSound: () => "Woof!"
+};
+
+// Multiple inheritance
+interface DomesticAnimal {
+    owner: string;
+}
+
+interface Pet extends Animal, DomesticAnimal {
+    furColor: string;
+}
+
+// Pet has: name, makeSound(), owner, furColor
+```
+
+### Example 7: Declaration Merging
 
 ```typescript
 // First declaration
@@ -185,36 +287,180 @@ interface User {
     age: number;
 }
 
-// User now has both 'name' and 'age'
+// Third declaration
+interface User {
+    email: string;
+}
+
+// User now has all three properties: name, age, email
 let user: User = {
     name: "Alice",
-    age: 30
+    age: 30,
+    email: "alice@example.com"
 };
+
+// This is useful for extending types from different sources
+// For example, adding properties to Express Request:
+// declare namespace Express {
+//     interface Request {
+//         user?: User;
+//     }
+// }
 ```
 
-## Practical Example: When to Use Interface vs Type
+### Example 8: Interface vs Type Alias Comparison
 
 ```typescript
-// Use interface for object shapes that may be extended
-interface Animal {
-    name: string;
-    sound(): string;
+// Interface
+interface Point {
+    x: number;
+    y: number;
 }
 
-// Use type for unions, intersections, and computed types
-type DogBreed = "Labrador" | "Poodle" | "Bulldog";
-type CatBreed = "Siamese" | "Persian" | "Maine Coon";
-type PetBreed = DogBreed | CatBreed;
+// Type alias (equivalent for objects)
+type PointType = {
+    x: number;
+    y: number;
+};
 
 // Interface can be extended
-interface Dog extends Animal {
-    breed: DogBreed;
+interface Point3D extends Point {
+    z: number;
 }
 
-// Type can use intersection
-type Cat = Animal & {
-    breed: CatBreed;
-};
+// Type alias uses intersection for extension
+type Point3DType = PointType & { z: number };
+
+// Type alias can represent primitives
+type ID = number;
+type Status = "active" | "inactive";
+
+// Interface cannot
+// interface ID extends number {} // Error
+
+// Type alias for union types
+type Shape = "circle" | "square" | "triangle";
+
+// Declaration merging: unique to interfaces
+interface Window {
+    title: string;
+}
+interface Window {
+    width: number;
+}
+interface Window {
+    height: number;
+}
+// Window now has title, width, height
+```
+
+### Example 9: Implementing Interfaces in Classes
+
+```typescript
+interface Flyable {
+    fly(): string;
+    land(): string;
+}
+
+interface Swimmable {
+    swim(): string;
+    dive(depth: number): string;
+}
+
+class Duck implements Flyable, Swimmable {
+    fly(): string {
+        return "Duck is flying";
+    }
+
+    land(): string {
+        return "Duck is landing on water";
+    }
+
+    swim(): string {
+        return "Duck is swimming";
+    }
+
+    dive(depth: number): string {
+        return `Duck is diving to ${depth} meters`;
+    }
+}
+
+// Interface with constructor
+interface ClockInterface {
+    tick(): void;
+}
+
+interface ClockConstructor {
+    new (hour: number, minute: number): ClockInterface;
+}
+
+class DigitalClock implements ClockInterface {
+    constructor(h: number, m: number) {}
+    tick(): void {
+        console.log("beep beep");
+    }
+}
+
+function createClock(
+    ctor: ClockConstructor,
+    hour: number,
+    minute: number
+): ClockInterface {
+    return new ctor(hour, minute);
+}
+```
+
+### Example 10: Advanced Interface Patterns
+
+```typescript
+// Interface inheritance with compatible types
+interface Base {
+    id: number;
+    createdAt: Date;
+}
+
+interface Updatable {
+    updatedAt: Date;
+}
+
+interface SoftDeletable {
+    deletedAt: Date | null;
+}
+
+// Combined interface
+interface Entity extends Base, Updatable, SoftDeletable {
+    version: number;
+}
+
+// Generic constraint using interface
+function saveEntity<T extends Entity>(entity: T): void {
+    console.log(`Saving entity ${entity.id} version ${entity.version}`);
+}
+
+// Interface with conditional types
+interface ApiResponse<T> {
+    data: T;
+    status: number;
+    message: string;
+    timestamp: Date;
+}
+
+// Pick from interface
+type UserFields = Pick<User, "name" | "email">;
+
+// Omit from interface
+type UserWithoutEmail = Omit<User, "email">;
+
+// Partial interface
+type PartialUser = Partial<User>;
+
+// Required interface (all optional become required)
+interface Config {
+    host?: string;
+    port?: number;
+}
+type StrictConfig = Required<Config>;
+// { host: string; port: number; }
 ```
 
 ## Analogy
@@ -229,15 +475,95 @@ An interface is like a job description -- it lists the required skills (properti
 - Type aliases can use computed properties (like `[key in ...]`), interfaces cannot.
 - When defining object shapes, interfaces are generally preferred because of their merging and extending capabilities.
 
-## Interview Questions
+## More Tricky Scenarios
 
-1. What is an interface in TypeScript and what is it used for?
-2. What is a type alias and how does it differ from an interface?
-3. Can type aliases represent primitive types? Can interfaces?
-4. What is declaration merging in interfaces?
-5. How do you make a property optional in an interface?
-6. How do you define a function type using an interface?
-7. When would you choose a type alias over an interface?
-8. How do you extend an interface and how do you create an intersection of types?
-9. Can a type alias be extended? How do you achieve similar functionality?
-10. What are readonly properties in an interface?
+### Tricky 1: Interface Merging vs Type Alias Overlap
+
+```typescript
+interface Box {
+    width: number;
+}
+interface Box {
+    height: number;
+}
+interface Box {
+    depth: number;
+}
+// Box has width, height, depth -- all merged
+
+// Type alias -- this is an error:
+// type BoxType = { width: number; };
+// type BoxType = { height: number; }; // Error: Duplicate identifier
+```
+
+### Tricky 2: Readonly Array vs Readonly in Interface
+
+```typescript
+interface ImmutablePoint {
+    readonly x: number;
+    readonly y: number;
+}
+
+// Readonly applies to the properties, not the variable
+let point: ImmutablePoint = { x: 10, y: 20 };
+// point.x = 5; // Error
+// But point itself can be reassigned:
+point = { x: 1, y: 2 }; // OK -- the variable is not const
+```
+
+### Tricky 3: Index Signature with Specific Properties
+
+```typescript
+interface Dictionary {
+    [key: string]: string;     // Index signature
+    length: number;            // Error: type 'number' not assignable to 'string'
+}
+
+// Fix: make the index signature a union
+interface DictionaryFixed {
+    [key: string]: string | number;
+    length: number;            // OK -- number is in the union
+}
+```
+
+## Interview Questions with Answers
+
+### 1. What is an interface in TypeScript and what is it used for?
+
+An interface defines a contract or shape for objects, specifying what properties and methods they must have along with their types. Interfaces are used for type-checking object structures, defining contracts between components, providing documentation through types, enabling IDE autocompletion, and serving as reusable type definitions. They can be extended, merged, and implemented by classes.
+
+### 2. What is a type alias and how does it differ from an interface?
+
+A type alias creates a name for any type (primitives, unions, tuples, objects). The key differences: interfaces support declaration merging (same name merges), type aliases do not; type aliases can represent primitives, unions, and tuples, interfaces cannot; interfaces use `extends` for inheritance, type aliases use `&` (intersection); type aliases support computed and mapped types; interfaces are generally preferred for object shapes due to their merging capability.
+
+### 3. Can type aliases represent primitive types? Can interfaces?
+
+Type aliases can represent primitive types: `type ID = number; type Status = "active" | "inactive"; type NullableString = string | null;`. Interfaces cannot represent primitive types directly -- they can only describe object shapes. An interface must define properties or methods; it cannot create an alias for `number` or `string`. This is one of the main reasons to use type aliases.
+
+### 4. What is declaration merging in interfaces?
+
+Declaration merging is a feature unique to interfaces where multiple declarations of the same interface name in the same scope are automatically merged into a single interface with all properties combined. For example, `interface User { name: string; }` and `interface User { age: number; }` merge to create `User { name: string; age: number; }`. This is useful for augmenting types from external libraries or adding properties to global types.
+
+### 5. How do you make a property optional in an interface?
+
+Add a `?` after the property name: `interface User { name: string; email?: string; }`. The `email` property is optional and can be omitted when creating objects conforming to the interface. Optional properties have the type `Type | undefined` internally. They are useful for configuration objects, partial updates, and scenarios where some properties may not be present.
+
+### 6. How do you define a function type using an interface?
+
+Use a call signature: `interface MathOp { (a: number, b: number): number; }`. This defines an interface that describes a function type. Variables can then be typed with this interface: `let add: MathOp = (x, y) => x + y;`. You can also combine call signatures with properties for more complex patterns (a callable object with additional properties).
+
+### 7. When would you choose a type alias over an interface?
+
+Choose type aliases when: representing primitive types (`type ID = number`), creating union types (`type Status = "active" | "inactive"`), using tuple types (`type Pair = [string, number]`), working with mapped types (`type Readonly<T> = { readonly [K in keyof T]: T[K] }`), combining types with intersection (`type C = A & B`), or when declaration merging is not desired. For object shapes that may be extended, interfaces are generally preferred.
+
+### 8. How do you extend an interface and how do you create an intersection of types?
+
+Extend an interface using the `extends` keyword: `interface Admin extends User { role: string; }`. For multiple parents: `interface Employee extends User, Timestamped { ... }`. Create intersection types using `&`: `type Admin = User & { role: string; }`. For multiple: `type C = A & B & { ... }`. The main difference is that `extends` works only with interfaces, while `&` works with any types including type aliases.
+
+### 9. Can a type alias be extended? How do you achieve similar functionality?
+
+Type aliases cannot be extended using `extends`, but you can achieve the same effect using intersection types: `type Admin = User & { role: string; permissions: string[]; };`. This creates a new type that has all properties of `User` plus the additional properties. You can also use intersections to combine multiple types: `type C = A & B & { customProp: number; };`.
+
+### 10. What are readonly properties in an interface?
+
+Readonly properties (marked with `readonly` keyword) can only be assigned when the object is first created and cannot be modified afterward. For example: `interface Point { readonly x: number; readonly y: number; }`. Attempting to modify a readonly property causes a compile error: `point.x = 5;` // Error. Readonly is a compile-time check only -- it does not enforce immutability at runtime.
