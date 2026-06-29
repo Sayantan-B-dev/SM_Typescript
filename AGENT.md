@@ -9,28 +9,6 @@ Only enrich files that satisfy **all** of these conditions:
 - **Already non-empty** (skip files that are empty or contain only whitespace)
 - **Never** touch files outside this range (e.g. Classes, Functions, Generics, Modules, Type Assertions, Type Guards, Upcoming_Stuff)
 
-### File List (17 files)
-| # | Directory | File |
-|---|-----------|------|
-| 1 | `00h00m00s_Intro` | `Intro.md` |
-| 2 | `00h04m07s_Setting_up_Environment_for_TypeScript` | `Setting_up_Environment_for_TypeScript.md` |
-| 3 | `00h07m16s_Installing_TypeScript` | `Installing_TypeScript.md` |
-| 4 | `00h10m23s_Installing_Essential_VS_Code_Extensions` | `Installing_Essential_VS_Code_Extensions.md` |
-| 5 | `00h12m11s_Setting_Up_and_Compiling_TypeScript_Project` | `Setting_Up_and_Compiling_TypeScript_Project.md` |
-| 6 | `00h21m06s_Introduction_to_Basic_Types` | `Introduction_to_Basic_Types.md` |
-| 7 | `00h31m13s_Primitive_Types` | `Primitive_Types.md` |
-| 8 | `00h34m09s_Arrays` | `Arrays.md` |
-| 9 | `00h37m22s_Tuples` | `Tuples.md` |
-| 10 | `00h40m21s_Enums` | `Enums.md` |
-| 11 | `00h45m18s_Any_Unknown_Void_and_More` | `Any_Unknown_Void_and_More.md` |
-| 12 | `00h55m40s_Introduction_to_Type_Inference_and_Type_Annotations` | `Introduction_to_Type_Inference_and_Type_Annotations.md` |
-| 13 | `00h57m38s_Type_Annotations` | `Type_Annotations.md` |
-| 14 | `00h58m36s_Introduction_to_Interfaces_and_Type_Aliases` | `Introduction_to_Interfaces_and_Type_Aliases.md` |
-| 15 | `01h10m56s_Extending_Interfaces` | `Extending_Interfaces.md` |
-| 16 | `01h15m05s_Fundamentals_of_Type_Aliases` | `Fundamentals_of_Type_Aliases.md` |
-| 17 | `01h17m59s_Intersection_Types` | `Intersection_Types.md` |
-
----
 
 ## 2. Content Requirements (per file)
 
@@ -71,12 +49,12 @@ Each enriched file **must** contain:
 ### 3.1 Grouping
 Files must be committed **in the same groups** as the original git history:
 
-| Group Name | Original Commit Message | Files |
-|-----------|------------------------|-------|
-| **basic data type** | `Current checkpoint : basic data type` | Intro, Setting_up_Environment, Installing_TypeScript, Installing_Essential_VS_Code_Extensions, Setting_Up_and_Compiling_TypeScript_Project, Introduction_to_Basic_Types |
-| **type inference** | `Current checkpoint : type inference` | Primitive_Types, Arrays, Tuples, Enums, Any_Unknown_Void_and_More |
-| **interfaces upcoming** | `Current checkpoint : interfaces upcoming` | Introduction_to_Type_Inference_and_Type_Annotations, Type_Annotations |
-| **OOP upcoming** | `Current checkpoint : OOP upcoming` | Introduction_to_Interfaces_and_Type_Aliases, Extending_Interfaces, Fundamentals_of_Type_Aliases, Intersection_Types |
+| Group Name | Original Commit Message |
+|-----------|------------------------|
+| **basic data type** | `Current checkpoint : basic data type` |
+| **type inference** | `Current checkpoint : type inference` |
+| **interfaces upcoming** | `Current checkpoint : interfaces upcoming` |
+| **OOP upcoming** | `Current checkpoint : OOP upcoming` |
 
 ### 3.2 Commit Messages
 - **First enrichment round**: Use format `Expanded: <group name> group with Q&A and examples`
@@ -84,7 +62,7 @@ Files must be committed **in the same groups** as the original git history:
 - **Subsequent rounds**: Use a short, descriptive prefix explaining what changed
   - e.g., `Fixed: <description>`, `Updated: <description>`
 - Only add files that were actually changed in that round.
-- Do NOT commit untargeted files (files outside the 17 listed above).
+- Do NOT commit untargeted files (files outside the specified range).
 
 ### 3.3 Commit Hygiene
 - Inspect `git status`, `git diff --cached`, `git add -A` before committing.
